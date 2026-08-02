@@ -6,7 +6,13 @@ using System.Text;
 
 namespace AcademiaDoZe.Domain.ValueObjects
 {
-    internal class Email
+    public record Email
     {
+        public string Valor { get; }
+
+        private Email(string valor)
+        {
+            Valor = valor;
+        }
     }
 }

@@ -6,7 +6,15 @@ using System.Text;
 
 namespace AcademiaDoZe.Domain.ValueObjects
 {
-    internal class Arquivo
+    public record Arquivo
     {
+        public string Nome { get; }
+        public byte[] Conteudo { get; }
+
+        private Arquivo(string nome, byte[] conteudo)
+        {
+            Nome = nome;
+            Conteudo = conteudo;
+        }
     }
 }

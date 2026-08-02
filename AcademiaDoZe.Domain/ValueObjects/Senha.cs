@@ -6,7 +6,13 @@ using System.Text;
 
 namespace AcademiaDoZe.Domain.ValueObjects
 {
-    internal class Senha
+    public record Senha
     {
+        public string Valor { get; }
+
+        private Senha(string valor)
+        {
+            Valor = valor;
+        }
     }
 }

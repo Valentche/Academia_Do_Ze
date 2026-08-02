@@ -6,7 +6,13 @@ using System.Text;
 
 namespace AcademiaDoZe.Domain.ValueObjects
 {
-    internal class Cep
+    public record Cep
     {
+        public string Valor { get; }
+
+        private Cep(string valor)
+        {
+            Valor = valor;
+        }
     }
 }

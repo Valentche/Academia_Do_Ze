@@ -6,7 +6,10 @@ using System.Text;
 
 namespace AcademiaDoZe.Domain.Enums
 {
-    internal class ColaboradorVinculo
+    public enum ColaboradorVinculo
     {
+        Estagio = 0,
+        Clt = 1,
+        Efetivado = 2
     }
 }

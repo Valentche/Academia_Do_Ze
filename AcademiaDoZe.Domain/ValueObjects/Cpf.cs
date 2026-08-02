@@ -6,7 +6,12 @@ using System.Text;
 
 namespace AcademiaDoZe.Domain.ValueObjects
 {
-    internal class Cpf
+    public record Cpf
     {
+        public string Valor { get; }
+        private Cpf(string valor)
+        {
+            Valor = valor;
+        }
     }
 }
