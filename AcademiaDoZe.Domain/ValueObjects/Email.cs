@@ -2,22 +2,30 @@
 
 using AcademiaDoZe.Domain.Common;
 using AcademiaDoZe.Domain.Services;
+
 namespace AcademiaDoZe.Domain.ValueObjects;
 
-public record Email
+public sealed record Email
 {
     public string Valor { get; }
+
     private Email(string valor)
     {
         Valor = valor;
     }
+
     public static Result<Email> Criar(string valor)
     {
-        var textoLimpo = NormalizadoService.LimparEspacos(valor);
+        // remove espaços e padroniza em minúsculas
+        // ("Fulano@Email.COM" e "fulano@email.com" ficam como o mesmo e-mail)
+        var textoLimpo = NormalizadoService.ParaMinusculo(NormalizadoService.LimparTodosEspacos(valor));
+
         if (string.IsNullOrWhiteSpace(textoLimpo) || !ValidarFormato(textoLimpo))
             return Result<Email>.Failure("Email", "EMAIL_FORMATO");
+
         return Result<Email>.Success(new Email(textoLimpo));
     }
+
     private static bool ValidarFormato(string email)
     {
         var partes = email.Split('@');
@@ -31,5 +39,6 @@ public record Email
         if (labels.Any(l => string.IsNullOrWhiteSpace(l))) return false;
         return true;
     }
+
     public override string ToString() => Valor;
 }
