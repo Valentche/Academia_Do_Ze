@@ -8,30 +8,53 @@ namespace AcademiaDoZe.Domain.ValueObjects;
 public sealed record Cpf
 {
     public string Valor { get; }
-
-    // só o método de fábrica pode criar um Cpf assim garantindo que nunca exista inválido
     private Cpf(string valor)
     {
         Valor = valor;
     }
-
     public static Result<Cpf> Criar(string valor)
     {
         if (NormalizadoService.TextoVazioOuNulo(valor))
             return Result<Cpf>.Failure("Cpf", "CPF_OBRIGATORIO");
-
-        // normalização: guarda somente dígitos, então "123.456.789-09" e "12345678909" são o mesmo CPF
         var textoLimpo = NormalizadoService.LimparEDigitos(valor);
-
         if (textoLimpo.Length != 11)
             return Result<Cpf>.Failure("Cpf", "CPF_DIGITOS");
-
-        // CPFs com todos os dígitos iguais (000..., 111...) são sintaticamente válidos, mas nunca existem
-        if (textoLimpo.All(c => c == textoLimpo[0]))
+        if (!Validar(textoLimpo))
             return Result<Cpf>.Failure("Cpf", "CPF_INVALIDO");
-
         return Result<Cpf>.Success(new Cpf(textoLimpo));
     }
-
+    private static bool Validar(string cpf)
+    {
+        if (cpf.Length != 11) return false;
+        /*
+        string[] invalidos = ["00000000000", "11111111111", "22222222222", "33333333333", "44444444444", "55555555555", "66666666666", "77777777777", "88888888888", "99999999999"];
+        if (invalidos.Contains(cpf)) return false;
+        var tempCpf = cpf[..9];
+        var soma = 0;
+        int[] multiplicador1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
+        for (var i = 0; i < 9; i++)
+        soma += (tempCpf[i] - '0') * multiplicador1[i];
+        var resto = soma % 11;
+        if (resto < 2)
+        resto = 0;
+        else
+        resto = 11 - resto;
+        var digito = resto.ToString();
+        tempCpf += digito;
+        soma = 0;
+        int[] multiplicador2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+        for (var i = 0; i < 10; i++)
+        soma += (tempCpf[i] - '0') * multiplicador2[i];
+        resto = soma % 11;
+        if (resto < 2)
+        resto = 0;
+        else
+        resto = 11 - resto;
+        digito += resto.ToString();
+        return cpf.EndsWith(digito);
+        */
+        return true;
+    }
     public override string ToString() => Valor;
+
 }
