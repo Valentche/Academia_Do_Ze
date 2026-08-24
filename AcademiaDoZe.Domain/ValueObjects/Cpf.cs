@@ -26,7 +26,6 @@ public sealed record Cpf
     private static bool Validar(string cpf)
     {
         if (cpf.Length != 11) return false;
-        /*
         string[] invalidos = ["00000000000", "11111111111", "22222222222", "33333333333", "44444444444", "55555555555", "66666666666", "77777777777", "88888888888", "99999999999"];
         if (invalidos.Contains(cpf)) return false;
         var tempCpf = cpf[..9];
@@ -52,8 +51,6 @@ public sealed record Cpf
         resto = 11 - resto;
         digito += resto.ToString();
         return cpf.EndsWith(digito);
-        */
-        return true;
     }
     public override string ToString() => Valor;
 
