@@ -39,7 +39,8 @@ public class LogradouroInfrastructureTests : TestBase
     }
 
     // Gera e insere um Logradouro padrão com CEP único para reuso nas asserções dos testes.
-    private async Task<Logradouro> CriarEInserirLogradouroAsync()
+    // Também é usado pelos testes das entidades que dependem de Logradouro (Colaborador, Aluno).
+    internal static async Task<Logradouro> CriarEInserirLogradouroAsync(LogradouroRepository logradouroRepo)
     {
         var logradouroResult = Logradouro.Criar(0, GerarCep(), NomeRua, NomeBairro, NomeCidade, NomeEstado, NomePais);
 
@@ -48,7 +49,7 @@ public class LogradouroInfrastructureTests : TestBase
             throw new Exception($"Falha ao criar Logradouro: {string.Join(", ", logradouroResult.Notifications.Select(n => n.Mensagem))}");
         }
 
-        return await _repository.Adicionar(logradouroResult.Value!);
+        return await logradouroRepo.Adicionar(logradouroResult.Value!);
     }
 
     [Fact(DisplayName = "Logradouro: Adicionar e ObterPorId com sucesso")]
@@ -87,7 +88,7 @@ public class LogradouroInfrastructureTests : TestBase
     [Fact(DisplayName = "Logradouro: ObterTodos retorna a lista preenchida")]
     public async Task Logradouro_ObterTodos_Sucesso()
     {
-        var logradouro = await CriarEInserirLogradouroAsync();
+        var logradouro = await CriarEInserirLogradouroAsync(_repository);
 
         var todos = await _repository.ObterTodos();
 
@@ -135,7 +136,7 @@ public class LogradouroInfrastructureTests : TestBase
     [Fact(DisplayName = "Logradouro: Remover apaga o registro do banco")]
     public async Task Logradouro_Remover_Sucesso()
     {
-        var logradouro = await CriarEInserirLogradouroAsync();
+        var logradouro = await CriarEInserirLogradouroAsync(_repository);
 
         var removido = await _repository.Remover(logradouro.Id);
 
@@ -157,7 +158,7 @@ public class LogradouroInfrastructureTests : TestBase
     [Fact(DisplayName = "Logradouro: ObterPorCep encontra o registro e retorna nulo para CEP inexistente")]
     public async Task Logradouro_ObterPorCep_SucessoENulo()
     {
-        var logradouro = await CriarEInserirLogradouroAsync();
+        var logradouro = await CriarEInserirLogradouroAsync(_repository);
 
         var obtido = await _repository.ObterPorCep(logradouro.Cep);
 
@@ -174,7 +175,7 @@ public class LogradouroInfrastructureTests : TestBase
     [Fact(DisplayName = "Logradouro: CepJaExiste valida duplicidade ignorando o próprio Id")]
     public async Task Logradouro_CepJaExiste_ValidacaoCorreta()
     {
-        var logradouro = await CriarEInserirLogradouroAsync();
+        var logradouro = await CriarEInserirLogradouroAsync(_repository);
 
         // O CEP existe na base.
         var existe = await _repository.CepJaExiste(logradouro.Cep);
@@ -193,7 +194,7 @@ public class LogradouroInfrastructureTests : TestBase
     [Fact(DisplayName = "Logradouro: ObterPorCidade filtra corretamente pela cidade")]
     public async Task Logradouro_ObterPorCidade_FiltragemCorreta()
     {
-        var logradouro = await CriarEInserirLogradouroAsync();
+        var logradouro = await CriarEInserirLogradouroAsync(_repository);
 
         var resultados = await _repository.ObterPorCidade(NomeCidade);
 
@@ -210,7 +211,7 @@ public class LogradouroInfrastructureTests : TestBase
     [Fact(DisplayName = "Logradouro: ObterPorBairro filtra corretamente por cidade e bairro")]
     public async Task Logradouro_ObterPorBairro_FiltragemCorreta()
     {
-        var logradouro = await CriarEInserirLogradouroAsync();
+        var logradouro = await CriarEInserirLogradouroAsync(_repository);
 
         var resultados = await _repository.ObterPorBairro(NomeCidade, NomeBairro);
 
