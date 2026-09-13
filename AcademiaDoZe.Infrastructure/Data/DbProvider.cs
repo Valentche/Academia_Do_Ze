@@ -140,7 +140,7 @@ public static class DbProvider
     {
         return dbType switch
         {
-            DatabaseType.SqlServer => "GETDATE()",
+            DatabaseType.SqlServer => "CAST(GETDATE() AS DATE)",
             DatabaseType.MySql => "CURRENT_DATE()",
             DatabaseType.Sqlite => "DATE('now')",
             _ => "CURRENT_DATE()"
