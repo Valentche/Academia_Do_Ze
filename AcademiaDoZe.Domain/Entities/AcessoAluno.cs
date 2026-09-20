@@ -1,27 +1,27 @@
 ﻿//Pablo Valente Neto
 
-using System;
-using System.Collections.Generic;
-using System.Text;
+using AcademiaDoZe.Domain.Common;
 
-namespace AcademiaDoZe.Domain.Entities
+namespace AcademiaDoZe.Domain.Entities;
+
+public sealed class AcessoAluno : Entity, IAggregateRoot
 {
-    public sealed class AcessoAluno : Entity
+    public int AlunoId { get; private set; }
+    public DateTime DataHora { get; private set; }
+    private AcessoAluno(int id, int alunoId, DateTime dataHora) : base(id)
     {
-        public Aluno Aluno { get; private set; }
-        public DateTime DataHoraEntrada { get; private set; }
-        public DateTime? DataHoraSaida { get; private set; }
-
-        private AcessoAluno(
-            int id,
-            Aluno aluno,
-            DateTime dataHoraEntrada,
-            DateTime? dataHoraSaida)
-            : base(id)
-        {
-            Aluno = aluno;
-            DataHoraEntrada = dataHoraEntrada;
-            DataHoraSaida = dataHoraSaida;
-        }
+        AlunoId = alunoId;
+        DataHora = dataHora;
+    }
+    public static Result<AcessoAluno> Criar(int id, Aluno aluno, DateTime dataHora)
+    {
+        var notifications = new List<Notification>();
+        if (aluno == null)
+            notifications.Add(new Notification("Aluno", "ALUNO_INVALIDO"));
+        if (dataHora.TimeOfDay < new TimeSpan(6, 0, 0) || dataHora.TimeOfDay > new TimeSpan(22, 0, 0))
+            notifications.Add(new Notification("DataHora", "DATA_HORA_INTERVALO_INVALIDO"));
+        if (notifications.Count != 0)
+            return Result<AcessoAluno>.Failure(notifications);
+        return Result<AcessoAluno>.Success(new AcessoAluno(id, aluno!.Id, dataHora));
     }
 }

@@ -1,4 +1,8 @@
 <Solution>
   <Folder Name="/Testes/" />
+  <Project Path="AcademiaDoZe.Application/AcademiaDoZe.Application.csproj" Id="8bc45b91-6f08-469c-86ed-944a0b62529d" />
+  <Project Path="AcademiaDoZe.Domain.Tests/AcademiaDoZe.Domain.Tests.csproj" Id="ba1f431f-d132-479c-aac5-19ffbf1ba31f" />
   <Project Path="AcademiaDoZe.Domain/AcademiaDoZe.Domain.csproj" />
+  <Project Path="AcademiaDoZe.Infrastructure.Tests/AcademiaDoZe.Infrastructure.Tests.csproj" />
+  <Project Path="AcademiaDoZe.Infrastructure/AcademiaDoZe.Infrastructure.csproj" />
 </Solution>

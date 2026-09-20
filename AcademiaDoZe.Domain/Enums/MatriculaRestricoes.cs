@@ -1,19 +1,18 @@
 ﻿//Pablo Valente Neto
 
-using System;
-using System.Collections.Generic;
-using System.Text;
+namespace AcademiaDoZe.Domain.Enums;
 
-namespace AcademiaDoZe.Domain.Enums
+// [Flags] permite combinar várias restrições em um único valor
+// ex.: MatriculaRestricoes.Diabetes | MatriculaRestricoes.Alergias e assim por diante, vai que o caba tem 
+// problema a rodo.
+[Flags]
+public enum MatriculaRestricoes
 {
-    public enum MatriculaRestricoes
-    {
-        None = 0,
-        Diabetes = 1,
-        PressaoAlta = 2,
-        Labirintite = 4,
-        Alergias = 8,
-        ProblemasRespiratorios = 16,
-        RemedioContinuo = 32
-    }
+    None = 0,
+    Diabetes = 1,
+    PressaoAlta = 2,
+    Labirintite = 4,
+    Alergias = 8,
+    ProblemasRespiratorios = 16,
+    RemedioContinuo = 32
 }
