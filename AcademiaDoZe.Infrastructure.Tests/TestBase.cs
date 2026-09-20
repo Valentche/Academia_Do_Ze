@@ -14,7 +14,7 @@ namespace AcademiaDoZe.Infrastructure.Tests;
 public abstract class TestBase
 {
     // Alterne o SGBD alvo dos testes trocando apenas a constante abaixo:
-    private const DatabaseType SelectedDatabaseType = DatabaseType.Sqlite;
+    private const DatabaseType SelectedDatabaseType = DatabaseType.MySql;
 
     // Caminho do arquivo físico usado pelo SQLite (da pra ver no DB Browser for SQLite).
     private const string SqliteDbPath = @"C:\DEV\AcademiaDoZe\db_academia_do_ze.db";
