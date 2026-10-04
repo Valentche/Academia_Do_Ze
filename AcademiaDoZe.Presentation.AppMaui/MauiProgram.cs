@@ -1,7 +1,7 @@
 using AcademiaDoZe.Presentation.AppMaui.ViewModels;
 using AcademiaDoZe.Presentation.AppMaui.Views;
-using AcademiaDoZe.Presentation.AppMaui.Configuration;
 using Microsoft.Extensions.Logging;
+using AcademiaDoZe.Presentation.AppMaui.Configuration;
 
 namespace AcademiaDoZe.Presentation.AppMaui;
 
@@ -16,9 +16,11 @@ public static class MauiProgram
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                // Adicione esta linha para registrar a fonte
+                fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
             });
 
-        // Configura os serviços da camada de aplicação e os repositórios (injeção de dependência)
+        // Configurar serviços da aplicação e repositórios
         ConfigurationHelper.ConfigureServices(builder.Services);
 
         // Registrar ViewModels
@@ -30,6 +32,7 @@ public static class MauiProgram
         builder.Services.AddTransient<DashboardListPage>();
         builder.Services.AddTransient<LogradouroListPage>();
         builder.Services.AddTransient<LogradouroPage>();
+        builder.Services.AddTransient<ConfigPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();
