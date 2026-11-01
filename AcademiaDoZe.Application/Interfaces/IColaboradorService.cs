@@ -1,4 +1,4 @@
-﻿using AcademiaDoZe.Application.DTOs;
+using AcademiaDoZe.Application.DTOs;
 using AcademiaDoZe.Application.Enums;
 namespace AcademiaDoZe.Application.Interfaces;
 /// <summary>
@@ -29,7 +29,9 @@ public interface IColaboradorService
     /// <summary>
     /// Obtém um colaborador buscando pelo seu CPF.
     /// </summary>
-    Task<ColaboradorDto?> ObterPorCpfAsync(string cpf, CancellationToken cancellationToken = default);
+    //Task<ColaboradorDto?> ObterPorCpfAsync(string cpf, CancellationToken cancellationToken = default);
+    // nova versão, que busca por prefixo do CPF, retornando múltiplos resultados
+    Task<IEnumerable<ColaboradorDto>> ObterPorCpfAsync(string cpf, CancellationToken cancellationToken = default);
     /// <summary>
     /// Obtém um colaborador buscando pelo seu email.
     /// </summary>

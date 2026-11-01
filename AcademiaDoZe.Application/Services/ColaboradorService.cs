@@ -69,15 +69,16 @@ public class ColaboradorService : IColaboradorService
         }
         return await _repoFactory().Remover(id, cancellationToken);
     }
-    public async Task<ColaboradorDto?> ObterPorCpfAsync(string cpf, CancellationToken cancellationToken = default)
+    // nova versão, retorna uma coleção de ColaboradorDTO - pode ser vazia
+    public async Task<IEnumerable<ColaboradorDto>> ObterPorCpfAsync(string cpf, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(cpf))
             throw new ArgumentException("CPF não pode ser vazio.", nameof(cpf));
-        var cpfResult = Cpf.Criar(cpf);
-        if (cpfResult.IsFailure)
-            throw new ArgumentException($"CPF inválido: {string.Join(", ", cpfResult.Notifications.Select(n => n.Mensagem))}", nameof(cpf));
-        var colaborador = await _repoFactory().ObterPorCpf(cpfResult.Value!, cancellationToken);
-        return colaborador?.ToDto();
+        var apenasDigitos = new string([.. cpf.Where(char.IsDigit)]);
+        if (string.IsNullOrWhiteSpace(apenasDigitos))
+            return Enumerable.Empty<ColaboradorDto>();
+        var colaboradores = await _repoFactory().ObterPorCpf(apenasDigitos, cancellationToken);
+        return colaboradores?.Select(c => c.ToDto()) ?? Enumerable.Empty<ColaboradorDto>();
     }
 
     public async Task<ColaboradorDto?> ObterPorEmailAsync(string email, CancellationToken cancellationToken = default)

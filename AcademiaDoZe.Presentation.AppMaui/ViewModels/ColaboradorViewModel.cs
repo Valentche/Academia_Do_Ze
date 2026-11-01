@@ -155,51 +155,52 @@ public partial class ColaboradorViewModel : BaseViewModel
     public async Task SearchByCpfAsync()
     {
         if (string.IsNullOrWhiteSpace(Colaborador.Cpf))
-        {
-            await Shell.Current.DisplayAlertAsync("Aviso", "Informe o CPF para realizar a busca.", "OK");
             return;
-        }
-
-        var apenasDigitos = new string([.. Colaborador.Cpf.Where(char.IsDigit)]);
-        if (apenasDigitos.Length != 11)
-        {
-            await Shell.Current.DisplayAlertAsync("Validação", "O CPF deve conter exatamente 11 dígitos numéricos.", "OK");
-            return;
-        }
 
         try
         {
             IsBusy = true;
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            var colaboradorData = await _colaboradorService.ObterPorCpfAsync(apenasDigitos, cts.Token);
-            if (colaboradorData != null)
-            {
-                colaboradorData.Endereco ??= new LogradouroDto
-                {
-                    Cep = string.Empty,
-                    Nome = string.Empty,
-                    Bairro = string.Empty,
-                    Cidade = string.Empty,
-                    Estado = string.Empty,
-                    Pais = "Brasil"
-                };
-                colaboradorData.Senha = string.Empty;
-                ConfirmarSenha = string.Empty;
-                Colaborador = colaboradorData;
-                ColaboradorId = colaboradorData.Id;
-                IsEditMode = true;
-                Title = "Editar Colaborador";
-                NotificarStatusEndereco();
-                await Shell.Current.DisplayAlertAsync("Aviso", "Colaborador já cadastrado! Dados carregados para edição.", "OK");
-            }
-            else
+
+            // normaliza para apenas dígitos (o repositório espera dígitos)
+            var cpfNormalized = new string(Colaborador.Cpf.Where(char.IsDigit).ToArray());
+            var resultados = (await _colaboradorService.ObterPorCpfAsync(cpfNormalized))?.ToList() ?? new List<ColaboradorDto>();
+
+            if (!resultados.Any())
             {
                 await Shell.Current.DisplayAlertAsync("Aviso", "CPF não encontrado.", "OK");
+                return;
             }
-        }
-        catch (OperationCanceledException)
-        {
-            await Shell.Current.DisplayAlertAsync("Tempo Esgotado", "A busca por CPF expirou. Verifique a conexão.", "OK");
+
+            if (resultados.Count == 1)
+            {
+                Colaborador = resultados.First();
+                ColaboradorId = Colaborador.Id;
+                IsEditMode = true;
+                NotificarStatusEndereco();
+                await Shell.Current.DisplayAlertAsync("Aviso", "Colaborador já cadastrado! Dados carregados para edição.", "OK");
+                return;
+            }
+
+            // múltiplos resultados -> perguntar ao usuário qual selecionar
+            var options = resultados.Select(c => $"{c.Id} - {c.Nome} ({c.Cpf})").ToArray();
+            var escolha = await Shell.Current.DisplayActionSheetAsync("Vários colaboradores encontrados", "Cancelar", null, options);
+            if (string.IsNullOrWhiteSpace(escolha) || escolha == "Cancelar")
+                return;
+
+            // extrai ID a partir da string selecionada ("{Id} - ...")
+            var idStr = escolha.Split('-', 2).FirstOrDefault()?.Trim();
+            if (int.TryParse(idStr, out var selId))
+            {
+                var selecionado = resultados.FirstOrDefault(c => c.Id == selId);
+                if (selecionado != null)
+                {
+                    Colaborador = selecionado;
+                    ColaboradorId = Colaborador.Id;
+                    IsEditMode = true;
+                    NotificarStatusEndereco();
+                    await Shell.Current.DisplayAlertAsync("Aviso", "Colaborador selecionado: dados carregados para edição.", "OK");
+                }
+            }
         }
         catch (Exception ex)
         {

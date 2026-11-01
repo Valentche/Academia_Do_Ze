@@ -14,7 +14,7 @@
                     
                     <StackLayout Spacing="5">
                         <Label Text="Tema" />
-                        <Picker x:Name="TemaPicker">
+                        <Picker x:Name="TemaPicker" SelectedIndexChanged="OnTemaSelectedIndexChanged">
                             <Picker.ItemsSource>
                                 <x:Array Type="{x:Type x:String}">
                                     <x:String>light</x:String>

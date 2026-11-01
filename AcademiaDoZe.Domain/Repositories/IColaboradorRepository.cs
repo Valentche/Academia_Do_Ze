@@ -1,4 +1,4 @@
-﻿//Pablo Valente Neto
+//Pablo Valente Neto
 
 using AcademiaDoZe.Domain.Entities;
 using AcademiaDoZe.Domain.Enums;
@@ -9,7 +9,9 @@ namespace AcademiaDoZe.Domain.Repositories;
 public interface IColaboradorRepository : IRepository<Colaborador>
 {
     // Métodos específicos do domínio
-    Task<Colaborador?> ObterPorCpf(Cpf cpf, CancellationToken cancellationToken = default);
+    //Task<Colaborador?> ObterPorCpf(Cpf cpf, CancellationToken cancellationToken = default);
+    // nova versão, retornando múltiplos colaboradores por prefixo (LIKE)
+    Task<IEnumerable<Colaborador>> ObterPorCpf(string cpf, CancellationToken cancellationToken = default);
     Task<Colaborador?> ObterPorEmail(Email email, CancellationToken cancellationToken = default);
     Task<bool> CpfJaExiste(Cpf cpf, int? id = null, CancellationToken cancellationToken = default);
     Task<bool> EmailJaExiste(Email email, int? id = null, CancellationToken cancellationToken = default);
