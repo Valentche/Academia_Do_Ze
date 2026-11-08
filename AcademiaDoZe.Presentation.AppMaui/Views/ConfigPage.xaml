@@ -145,7 +145,7 @@
                     Margin="20"
                     Padding="16">
 
-                <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+                <Grid RowDefinitions="Auto,*" RowSpacing="12">
                     <!-- Topo do Modal -->
                     <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" VerticalOptions="Center">
                         <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
@@ -176,21 +176,6 @@
                                  HorizontalOptions="Fill"
                                  VerticalOptions="Fill"/>
                     </Border>
-
-                    <!-- Rodapé do Modal -->
-                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto" VerticalOptions="Center">
-                        <Label Grid.Column="0"
-                               Text="Academia do Zé • De teus pulos! 🏋️‍♂️💪"
-                               FontSize="12"
-                               FontAttributes="Italic"
-                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
-                               VerticalOptions="Center"/>
-                        <Label Grid.Column="1"
-                               Text="Código 'deteuspulos' ativado"
-                               FontSize="11"
-                               TextColor="{StaticResource Primary}"
-                               VerticalOptions="Center"/>
-                    </Grid>
                 </Grid>
             </Border>
         </Grid>
