@@ -7,7 +7,7 @@ namespace AcademiaDoZe.Presentation.AppMaui.ViewModels;
 
 public partial class MatriculaListViewModel : BaseViewModel
 {
-    public ObservableCollection<string> FilterTypes { get; } = ["Id", "Id Aluno", "Ativas", "Vencendo em dias"];
+    public ObservableCollection<string> FilterTypes { get; } = ["Nome", "CPF", "Id", "Id Aluno", "Ativas", "Vencendo em dias"];
     private readonly IMatriculaService _matriculaService;
 
     private string _searchText = string.Empty;
@@ -17,7 +17,7 @@ public partial class MatriculaListViewModel : BaseViewModel
         set => SetProperty(ref _searchText, value);
     }
 
-    private string _selectedFilterType = "Ativas";
+    private string _selectedFilterType = "Nome";
     public string SelectedFilterType
     {
         get => _selectedFilterType;
@@ -110,9 +110,30 @@ public partial class MatriculaListViewModel : BaseViewModel
                     resultados = await _matriculaService.ObterTodasAsync(cts.Token) ?? [];
                 }
             }
+            else if (SelectedFilterType == "Nome")
+            {
+                var todas = await _matriculaService.ObterTodasAsync(cts.Token) ?? [];
+                var termo = SearchText.Trim();
+                resultados = todas.Where(m => m.AlunoMatricula?.Nome != null &&
+                    m.AlunoMatricula.Nome.Contains(termo, StringComparison.OrdinalIgnoreCase));
+            }
+            else if (SelectedFilterType == "CPF")
+            {
+                var cpfLimpo = new string([.. SearchText.Where(char.IsDigit)]);
+                var todas = await _matriculaService.ObterTodasAsync(cts.Token) ?? [];
+                if (cpfLimpo.Length > 0)
+                {
+                    resultados = todas.Where(m => m.AlunoMatricula?.Cpf != null &&
+                        new string([.. m.AlunoMatricula.Cpf.Where(char.IsDigit)]).Contains(cpfLimpo));
+                }
+                else
+                {
+                    resultados = todas;
+                }
+            }
             else if (SelectedFilterType == "Id")
             {
-                if (int.TryParse(SearchText.Trim(), out int id))
+                if (int.TryParse(SearchText.Trim(), out int id) && id > 0)
                 {
                     var matricula = await _matriculaService.ObterPorIdAsync(id, cts.Token);
                     if (matricula != null)
@@ -125,7 +146,7 @@ public partial class MatriculaListViewModel : BaseViewModel
             }
             else if (SelectedFilterType == "Id Aluno")
             {
-                if (int.TryParse(SearchText.Trim(), out int alunoId))
+                if (int.TryParse(SearchText.Trim(), out int alunoId) && alunoId > 0)
                 {
                     resultados = await _matriculaService.ObterPorAlunoIdAsync(alunoId, cts.Token) ?? [];
                 }
@@ -136,8 +157,17 @@ public partial class MatriculaListViewModel : BaseViewModel
             }
             else if (SelectedFilterType == "Ativas")
             {
-                int.TryParse(SearchText.Trim(), out int alunoId);
-                resultados = await _matriculaService.ObterAtivasAsync(alunoId, cts.Token) ?? [];
+                var termo = SearchText.Trim();
+                if (int.TryParse(termo, out int alunoId) && alunoId > 0)
+                {
+                    resultados = await _matriculaService.ObterAtivasAsync(alunoId, cts.Token) ?? [];
+                }
+                else
+                {
+                    var ativas = await _matriculaService.ObterAtivasAsync(0, cts.Token) ?? [];
+                    resultados = ativas.Where(m => m.AlunoMatricula?.Nome != null &&
+                        m.AlunoMatricula.Nome.Contains(termo, StringComparison.OrdinalIgnoreCase));
+                }
             }
             else if (SelectedFilterType == "Vencendo em dias")
             {
@@ -149,6 +179,13 @@ public partial class MatriculaListViewModel : BaseViewModel
                 {
                     await Shell.Current.DisplayAlertAsync("Aviso", "Para busca por vencimento, informe a quantidade de dias (número inteiro).", "OK");
                 }
+            }
+            else
+            {
+                var todas = await _matriculaService.ObterTodasAsync(cts.Token) ?? [];
+                var termo = SearchText.Trim();
+                resultados = todas.Where(m => m.AlunoMatricula?.Nome != null &&
+                    m.AlunoMatricula.Nome.Contains(termo, StringComparison.OrdinalIgnoreCase));
             }
 
             // Atualiza a coleção na thread principal

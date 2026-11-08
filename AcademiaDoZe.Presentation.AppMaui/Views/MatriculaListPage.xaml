@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="AcademiaDoZe.Presentation.AppMaui.Views.MatriculaListPage"
@@ -40,7 +40,14 @@
                             </Border>
 
                             <!-- Nome do Aluno -->
-                            <Label Grid.Row="0" Grid.Column="0" Text="{Binding AlunoMatricula.Nome}" FontAttributes="Bold" FontSize="16" Margin="0,0,0,2" LineBreakMode="TailTruncation"/>
+                            <Label Grid.Row="0" Grid.Column="0" Margin="0,0,0,2" LineBreakMode="TailTruncation">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding Id, StringFormat='[#{0}] '}" FontAttributes="Bold" FontSize="16" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
+                                        <Span Text="{Binding AlunoMatricula.Nome}" FontAttributes="Bold" FontSize="16"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
 
                             <!-- CPF e Nascimento -->
                             <Label Grid.Row="1" Grid.Column="0" Margin="0,0,0,4" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}">
@@ -115,7 +122,7 @@
         <Border Grid.Row="0" Style="{StaticResource CardBorder}" Margin="15,10">
             <Grid ColumnDefinitions="Auto,10,*,10,Auto" VerticalOptions="Center">
                 <Picker Grid.Column="0" Title="" ItemsSource="{Binding FilterTypes}" SelectedItem="{Binding SelectedFilterType}" WidthRequest="110" HorizontalOptions="Start" HeightRequest="40" VerticalOptions="Center"/>
-                <Entry Grid.Column="2" Text="{Binding SearchText}" Placeholder="Digite o valor..." HeightRequest="40" VerticalOptions="Center" ClearButtonVisibility="WhileEditing" ReturnCommand="{Binding SearchMatriculasCommand}" />
+                <Entry x:Name="SearchEntry" Grid.Column="2" Text="{Binding SearchText}" Placeholder="Digite o valor..." HeightRequest="40" VerticalOptions="Center" ClearButtonVisibility="WhileEditing" ReturnCommand="{Binding SearchMatriculasCommand}" TextChanged="OnSearchDebounceTextChanged" />
                 <Button Grid.Column="4" Text="" Style="{StaticResource ButtonPrimary}" FontSize="14" WidthRequest="80" HeightRequest="40" Command="{Binding SearchMatriculasCommand}">
                     <Button.ImageSource>
                         <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe8b6;" />

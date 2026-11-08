@@ -1,4 +1,4 @@
-using AcademiaDoZe.Application.DTOs;
+﻿using AcademiaDoZe.Application.DTOs;
 using AcademiaDoZe.Presentation.AppMaui.ViewModels;
 
 namespace AcademiaDoZe.Presentation.AppMaui.Views;
@@ -69,5 +69,23 @@ public partial class MatriculaListPage : ContentPage
             default:
                 break;
         }
+    }
+    private CancellationTokenSource? _searchCts;
+
+    private async void OnSearchDebounceTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        try
+        {
+            _searchCts?.Cancel();
+            _searchCts = new CancellationTokenSource();
+            var token = _searchCts.Token;
+            await Task.Delay(300, token);
+            if (token.IsCancellationRequested) return;
+            if (BindingContext is MatriculaListViewModel vm)
+            {
+                await vm.SearchMatriculasCommand.ExecuteAsync(null);
+            }
+        }
+        catch (TaskCanceledException) { /* ignorar */ }
     }
 }
