@@ -1,5 +1,6 @@
 using AcademiaDoZe.Application.Enums;
 using AcademiaDoZe.Presentation.AppMaui.Message;
+using AcademiaDoZe.Presentation.AppMaui.Services;
 using CommunityToolkit.Mvvm.Messaging;
 
 namespace AcademiaDoZe.Presentation.AppMaui.Views;
@@ -7,6 +8,8 @@ namespace AcademiaDoZe.Presentation.AppMaui.Views;
 public partial class ConfigPage : ContentPage
 {
     private bool _isCarregando = true;
+    private EasterEggVideoServer? _videoServer;
+    private string? _videoPathAtual;
 
     public ConfigPage()
     {
@@ -194,16 +197,98 @@ public partial class ConfigPage : ContentPage
     }
     #endregion
 
+    #region Easter Egg
+    private async void OnAtivarCodigoClicked(object? sender, EventArgs e)
+    {
+        var codigo = CodigoEspecialEntry?.Text?.Trim()?.ToLowerInvariant() ?? string.Empty;
+
+        // Aceita "deteuspulos" e variações comuns com espaço
+        if (codigo == "deteuspulos" || codigo == "de teus pulos")
+        {
+            await IniciarEasterEggAsync();
+        }
+        else if (string.IsNullOrWhiteSpace(codigo))
+        {
+            await DisplayAlertAsync("Aviso", "Por favor, digite um código de acesso.", "OK");
+        }
+        else
+        {
+            await DisplayAlertAsync("Código Inválido", "Código não reconhecido. Dica: Qual é o lema oficial da Academia do Zé? 😉", "Tentar Novamente");
+        }
+    }
+
+    private async Task IniciarEasterEggAsync()
+    {
+        try
+        {
+            _videoPathAtual = await EasterEggVideoServer.ObterCaminhoVideoAsync();
+
+            if (string.IsNullOrEmpty(_videoPathAtual) || !File.Exists(_videoPathAtual))
+            {
+                await DisplayAlertAsync("Easter Egg", "Vídeo 'Editado_academiadoze.mp4' não encontrado nos caminhos do aplicativo.", "OK");
+                return;
+            }
+
+            // Inicia servidor local de streaming
+            _videoServer?.Dispose();
+            _videoServer = new EasterEggVideoServer(_videoPathAtual);
+            var serverUrl = _videoServer.Start();
+
+            // Carrega WebView e exibe o popup modal
+            EasterEggWebView.Source = new UrlWebViewSource { Url = serverUrl };
+            EasterEggOverlay.IsVisible = true;
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync("Erro", $"Erro ao inicializar vídeo do Easter Egg: {ex.Message}", "OK");
+        }
+    }
+
+    private void OnFecharEasterEggClicked(object? sender, EventArgs e)
+    {
+        // Fecha o popup e interrompe a reprodução
+        EasterEggOverlay.IsVisible = false;
+        EasterEggWebView.Source = new HtmlWebViewSource { Html = "<html><body style='background:#000;'></body></html>" };
+        _videoServer?.Dispose();
+        _videoServer = null;
+    }
+
+    private async void OnAbrirExternoClicked(object? sender, EventArgs e)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(_videoPathAtual) && File.Exists(_videoPathAtual))
+            {
+                await Launcher.Default.OpenAsync(new OpenFileRequest
+                {
+                    Title = "De Teus Pulos - Academia do Zé",
+                    File = new ReadOnlyFile(_videoPathAtual)
+                });
+            }
+            else
+            {
+                await DisplayAlertAsync("Aviso", "Arquivo de vídeo não disponível para abertura externa.", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync("Erro", $"Não foi possível abrir o player externo: {ex.Message}", "OK");
+        }
+    }
+    #endregion
+
     private async void OnCancelarClicked(object? sender, EventArgs e)
     {
         // retornar para dashboard
         await Shell.Current.GoToAsync("//dashboard");
     }
 
-    // Ao fechar a página, chama WeakReferenceMessenger.Default.UnregisterAll(this); para evitar vazamentos de memória - memory leaks
+    // Ao fechar a página, garante liberação de recursos para evitar vazamentos de memória
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+        // Garante que o player é encerrado se o usuário sair da tela
+        OnFecharEasterEggClicked(this, EventArgs.Empty);
         // Desinscreve o mensageiro para evitar memory leaks
         WeakReferenceMessenger.Default.UnregisterAll(this);
     }

@@ -4,97 +4,196 @@
              x:Class="AcademiaDoZe.Presentation.AppMaui.Views.ConfigPage"
              Title="Configurações">
 
-    <ScrollView>
-        <StackLayout Spacing="20">
-            
-            <!-- Tema -->
-            <Border Style="{StaticResource CardBorder}" Margin="15,10">
-                <StackLayout Spacing="15">
-                    <Label Text="Tema" Style="{StaticResource SubHeadline}"/>
-                    
-                    <StackLayout Spacing="5">
-                        <Label Text="Tema" />
-                        <Picker x:Name="TemaPicker" SelectedIndexChanged="OnTemaSelectedIndexChanged">
-                            <Picker.ItemsSource>
-                                <x:Array Type="{x:Type x:String}">
-                                    <x:String>light</x:String>
-                                    <x:String>dark</x:String>
-                                    <x:String>system</x:String>
-                                </x:Array>
-                            </Picker.ItemsSource>
-                        </Picker>
-                    </StackLayout>
-                    
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                        <Button Grid.Column="0" Text="Cancelar" Clicked="OnCancelarClicked" Style="{StaticResource ButtonSecondary}" HeightRequest="45"/>
-                        <Button Grid.Column="1" Text="Salvar Tema" Clicked="OnSalvarTemaClicked" Style="{StaticResource ButtonPrimary}" HeightRequest="45"/>
-                    </Grid>
-                </StackLayout>
-            </Border>
-
-            <!-- Credenciais do Banco -->
-            <Border Style="{StaticResource CardBorder}" Margin="15,10">
-                <StackLayout Spacing="15">
-                    <Label Text="Credenciais do Banco" Style="{StaticResource SubHeadline}"/>
-                    
-                    <Grid ColumnDefinitions="*" ColumnSpacing="10">
-                        <StackLayout Spacing="5" Grid.Column="0">
-                            <Label Text="Tipo de Gerenciador"/>
-                            <Picker x:Name="DatabaseTypePicker" SelectedIndexChanged="OnDatabaseTypeChanged"/>
+    <Grid>
+        <ScrollView>
+            <StackLayout Spacing="20">
+                
+                <!-- Tema -->
+                <Border Style="{StaticResource CardBorder}" Margin="15,10">
+                    <StackLayout Spacing="15">
+                        <Label Text="Tema" Style="{StaticResource SubHeadline}"/>
+                        
+                        <StackLayout Spacing="5">
+                            <Label Text="Tema" />
+                            <Picker x:Name="TemaPicker" SelectedIndexChanged="OnTemaSelectedIndexChanged">
+                                <Picker.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>light</x:String>
+                                        <x:String>dark</x:String>
+                                        <x:String>system</x:String>
+                                    </x:Array>
+                                </Picker.ItemsSource>
+                            </Picker>
                         </StackLayout>
+                        
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <Button Grid.Column="0" Text="Cancelar" Clicked="OnCancelarClicked" Style="{StaticResource ButtonSecondary}" HeightRequest="45"/>
+                            <Button Grid.Column="1" Text="Salvar Tema" Clicked="OnSalvarTemaClicked" Style="{StaticResource ButtonPrimary}" HeightRequest="45"/>
+                        </Grid>
+                    </StackLayout>
+                </Border>
+
+                <!-- Credenciais do Banco -->
+                <Border Style="{StaticResource CardBorder}" Margin="15,10">
+                    <StackLayout Spacing="15">
+                        <Label Text="Credenciais do Banco" Style="{StaticResource SubHeadline}"/>
+                        
+                        <Grid ColumnDefinitions="*" ColumnSpacing="10">
+                            <StackLayout Spacing="5" Grid.Column="0">
+                                <Label Text="Tipo de Gerenciador"/>
+                                <Picker x:Name="DatabaseTypePicker" SelectedIndexChanged="OnDatabaseTypeChanged"/>
+                            </StackLayout>
+                        </Grid>
+
+                        <!-- Mensagem informativa para SQLite -->
+                        <Border x:Name="SqliteInfoCard" IsVisible="False" BackgroundColor="{AppThemeBinding Light=#F0F7FF, Dark=#1A2633}" StrokeShape="RoundRectangle 8" Padding="12">
+                            <Label Text=" O SQLite é um banco de dados local armazenado em arquivo. Não requer servidor de rede, usuário ou senha." 
+                                   FontSize="13" 
+                                   TextColor="{AppThemeBinding Light=#0056B3, Dark=#66B2FF}"/>
+                        </Border>
+
+                        <!-- Campo específico para SQLite (Caminho do arquivo .db) -->
+                        <StackLayout x:Name="SqliteContainer" Spacing="5" IsVisible="False">
+                            <Label Text="Caminho / Arquivo do Banco (.db)"/>
+                            <Entry x:Name="SqliteCaminhoEntry" Placeholder="Ex: C:\DEV\AcademiaDoZe\db_academia_do_ze.db"/>
+                        </StackLayout>
+
+                        <!-- Configurações de Servidor e Banco (SQL Server e MySQL) -->
+                        <Grid x:Name="ServidorBancoGrid" ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <StackLayout Spacing="5" Grid.Column="0">
+                                <Label Text="Servidor"/>
+                                <Entry x:Name="ServidorEntry" Placeholder="Digite o servidor..."/>
+                            </StackLayout>
+                            <StackLayout Spacing="5" Grid.Column="1">
+                                <Label Text="Banco"/>
+                                <Entry x:Name="BancoEntry" Placeholder="Digite o nome do banco..."/>
+                            </StackLayout>
+                        </Grid>
+
+                        <!-- Credenciais de Acesso (SQL Server e MySQL) -->
+                        <Grid x:Name="CredenciaisGrid" ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <StackLayout Spacing="5" Grid.Column="0">
+                                <Label Text="Usuário"/>
+                                <Entry x:Name="UsuarioEntry" Placeholder="Digite o usuário..."/>
+                            </StackLayout>
+                            <StackLayout Spacing="5" Grid.Column="1">
+                                <Label Text="Senha"/>
+                                <Entry x:Name="SenhaEntry" Placeholder="Digite a senha..." IsPassword="True"/>
+                            </StackLayout>
+                        </Grid>
+
+                        <!-- Complemento / Parâmetros adicionais da connection string -->
+                        <StackLayout Spacing="5">
+                            <Label x:Name="ComplementoLabel" Text="Complemento"/>
+                            <Entry x:Name="ComplementoEntry" Placeholder="Digite o complemento..."/>
+                        </StackLayout>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="15,10">
+                            <Button Grid.Column="0" Text="Cancelar" Clicked="OnCancelarClicked" Style="{StaticResource ButtonSecondary}" HeightRequest="45"/>
+                            <Button Grid.Column="1" Text="Salvar BD" Clicked="OnSalvarBdClicked" Style="{StaticResource ButtonPrimary}" HeightRequest="45"/>
+                        </Grid>
+
+                    </StackLayout>
+                </Border>
+
+                <!-- Acesso Especial / Easter Egg -->
+                <Border Style="{StaticResource CardBorder}" Margin="15,10">
+                    <StackLayout Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                            <Label Grid.Column="0" Text="Acesso Especial" Style="{StaticResource SubHeadline}" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="&#xe897;" FontFamily="MaterialIcons" FontSize="20" TextColor="{StaticResource Primary}" VerticalOptions="Center"/>
+                        </Grid>
+
+                        <Label Text="Possui uma chave de ativação ou código de acesso especial?" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"/>
+
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <Entry x:Name="CodigoEspecialEntry"
+                                   Placeholder="Digite o código secreto..."
+                                   ClearButtonVisibility="WhileEditing"
+                                   Completed="OnAtivarCodigoClicked" />
+                            <Button Grid.Column="1"
+                                    Text="Desbloquear"
+                                    Clicked="OnAtivarCodigoClicked"
+                                    Style="{StaticResource ButtonPrimary}"
+                                    HeightRequest="42"
+                                    Padding="16,0" />
+                        </Grid>
+                    </StackLayout>
+                </Border>
+
+            </StackLayout>
+        </ScrollView>
+
+        <!-- Overlay / Popup do Easter Egg -->
+        <Grid x:Name="EasterEggOverlay"
+              IsVisible="False"
+              BackgroundColor="{AppThemeBinding Light=#B3000000, Dark=#D9000000}"
+              HorizontalOptions="Fill"
+              VerticalOptions="Fill">
+
+            <!-- Card Modal Centralizado -->
+            <Border Style="{StaticResource CardBorder}"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+                    Stroke="{StaticResource Primary}"
+                    StrokeThickness="2"
+                    MaximumWidthRequest="780"
+                    MaximumHeightRequest="580"
+                    WidthRequest="750"
+                    HeightRequest="520"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    Margin="20"
+                    Padding="16">
+
+                <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+                    <!-- Topo do Modal -->
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" VerticalOptions="Center">
+                        <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
+                            <Label Text="&#xe037;" FontFamily="MaterialIcons" FontSize="22" TextColor="{StaticResource Primary}" VerticalOptions="Center"/>
+                            <Label Text="Easter Egg - De Teus Pulos!" FontAttributes="Bold" FontSize="16" VerticalOptions="Center" TextColor="{StaticResource Primary}"/>
+                        </HorizontalStackLayout>
+                        <Button Grid.Column="1"
+                                Text="Abrir Externo"
+                                Clicked="OnAbrirExternoClicked"
+                                Style="{StaticResource ButtonSecondary}"
+                                HeightRequest="36"
+                                Padding="12,0"/>
+                        <Button Grid.Column="2"
+                                Text="✕ Fechar"
+                                Clicked="OnFecharEasterEggClicked"
+                                Style="{StaticResource ButtonPrimary}"
+                                HeightRequest="36"
+                                Padding="12,0"/>
                     </Grid>
 
-                    <!-- Mensagem informativa para SQLite -->
-                    <Border x:Name="SqliteInfoCard" IsVisible="False" BackgroundColor="{AppThemeBinding Light=#F0F7FF, Dark=#1A2633}" StrokeShape="RoundRectangle 8" Padding="12">
-                        <Label Text=" O SQLite é um banco de dados local armazenado em arquivo. Não requer servidor de rede, usuário ou senha." 
-                               FontSize="13" 
-                               TextColor="{AppThemeBinding Light=#0056B3, Dark=#66B2FF}"/>
+                    <!-- Área do Vídeo -->
+                    <Border Grid.Row="1"
+                            StrokeShape="RoundRectangle 8"
+                            BackgroundColor="Black"
+                            StrokeThickness="1"
+                            Stroke="{StaticResource Gray600}">
+                        <WebView x:Name="EasterEggWebView"
+                                 HorizontalOptions="Fill"
+                                 VerticalOptions="Fill"/>
                     </Border>
 
-                    <!-- Campo específico para SQLite (Caminho do arquivo .db) -->
-                    <StackLayout x:Name="SqliteContainer" Spacing="5" IsVisible="False">
-                        <Label Text="Caminho / Arquivo do Banco (.db)"/>
-                        <Entry x:Name="SqliteCaminhoEntry" Placeholder="Ex: C:\DEV\AcademiaDoZe\db_academia_do_ze.db"/>
-                    </StackLayout>
-
-                    <!-- Configurações de Servidor e Banco (SQL Server e MySQL) -->
-                    <Grid x:Name="ServidorBancoGrid" ColumnDefinitions="*,*" ColumnSpacing="10">
-                        <StackLayout Spacing="5" Grid.Column="0">
-                            <Label Text="Servidor"/>
-                            <Entry x:Name="ServidorEntry" Placeholder="Digite o servidor..."/>
-                        </StackLayout>
-                        <StackLayout Spacing="5" Grid.Column="1">
-                            <Label Text="Banco"/>
-                            <Entry x:Name="BancoEntry" Placeholder="Digite o nome do banco..."/>
-                        </StackLayout>
+                    <!-- Rodapé do Modal -->
+                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                        <Label Grid.Column="0"
+                               Text="Academia do Zé • De teus pulos! 🏋️‍♂️💪"
+                               FontSize="12"
+                               FontAttributes="Italic"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
+                               VerticalOptions="Center"/>
+                        <Label Grid.Column="1"
+                               Text="Código 'deteuspulos' ativado"
+                               FontSize="11"
+                               TextColor="{StaticResource Primary}"
+                               VerticalOptions="Center"/>
                     </Grid>
-
-                    <!-- Credenciais de Acesso (SQL Server e MySQL) -->
-                    <Grid x:Name="CredenciaisGrid" ColumnDefinitions="*,*" ColumnSpacing="10">
-                        <StackLayout Spacing="5" Grid.Column="0">
-                            <Label Text="Usuário"/>
-                            <Entry x:Name="UsuarioEntry" Placeholder="Digite o usuário..."/>
-                        </StackLayout>
-                        <StackLayout Spacing="5" Grid.Column="1">
-                            <Label Text="Senha"/>
-                            <Entry x:Name="SenhaEntry" Placeholder="Digite a senha..." IsPassword="True"/>
-                        </StackLayout>
-                    </Grid>
-
-                    <!-- Complemento / Parâmetros adicionais da connection string -->
-                    <StackLayout Spacing="5">
-                        <Label x:Name="ComplementoLabel" Text="Complemento"/>
-                        <Entry x:Name="ComplementoEntry" Placeholder="Digite o complemento..."/>
-                    </StackLayout>
-
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="15,10">
-                        <Button Grid.Column="0" Text="Cancelar" Clicked="OnCancelarClicked" Style="{StaticResource ButtonSecondary}" HeightRequest="45"/>
-                        <Button Grid.Column="1" Text="Salvar BD" Clicked="OnSalvarBdClicked" Style="{StaticResource ButtonPrimary}" HeightRequest="45"/>
-                    </Grid>
-
-                </StackLayout>
+                </Grid>
             </Border>
+        </Grid>
+    </Grid>
 
-        </StackLayout>
-    </ScrollView>
 </ContentPage>
