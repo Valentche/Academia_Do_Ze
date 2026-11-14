@@ -24,4 +24,5 @@ public sealed class AcessoAluno : Entity, IAggregateRoot
             return Result<AcessoAluno>.Failure(notifications);
         return Result<AcessoAluno>.Success(new AcessoAluno(id, aluno!.Id, dataHora));
     }
+    public static AcessoAluno Carregar(int id, int alunoId, DateTime dataHora) => new(id, alunoId, dataHora);
 }

@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AcademiaDoZe.Presentation.AppMaui.Views.ControleAcessoPage"
+             xmlns:vm="clr-namespace:AcademiaDoZe.Presentation.AppMaui.ViewModels"
+             x:DataType="vm:ControleAcessoViewModel"
+             xmlns:dto="clr-namespace:AcademiaDoZe.Application.DTOs;assembly=AcademiaDoZe.Application"
+             xmlns:converters="clr-namespace:AcademiaDoZe.Presentation.AppMaui.Converters"
+             Title="{Binding Title}">
+
+    <ContentPage.Resources>
+        <converters:FotoToImageSourceConverter x:Key="FotoConverter" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="16" Padding="16,12,16,24">
+
+            <!-- 1. Cabeçalho Principal -->
+            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                <Label Text="Controle de Acesso / Catraca"
+                       FontAttributes="Bold"
+                       FontSize="22"
+                       HorizontalOptions="Center" />
+                <Label Text="Selecione se o acesso é de um Aluno ou Colaborador:"
+                       FontSize="13"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!-- 2. Alternador de Modo (Aluno / Colaborador) -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="4,0">
+                <Button Grid.Column="0"
+                        Text="🎓 Aluno"
+                        Command="{Binding SelecionarModoAlunoCommand}"
+                        FontAttributes="Bold"
+                        FontSize="15"
+                        HeightRequest="46"
+                        CornerRadius="8"
+                        BackgroundColor="{Binding ModoAluno, Converter={converters:EnumDisplayConverter}}"
+                        Style="{Binding ModoAluno, ConverterParameter=Primary, Converter={x:Null}}">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding ModoAluno}" Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                            <Setter Property="TextColor" Value="White" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Button" Binding="{Binding ModoAluno}" Value="False">
+                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}" />
+                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+
+                <Button Grid.Column="1"
+                        Text="💼 Colaborador"
+                        Command="{Binding SelecionarModoColaboradorCommand}"
+                        FontAttributes="Bold"
+                        FontSize="15"
+                        HeightRequest="46"
+                        CornerRadius="8">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding ModoColaborador}" Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                            <Setter Property="TextColor" Value="White" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Button" Binding="{Binding ModoColaborador}" Value="False">
+                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}" />
+                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+            </Grid>
+
+            <!-- Texto auxiliar de modo selecionado -->
+            <Label Text="{Binding TextoModoSelecionado}"
+                   FontSize="12"
+                   TextColor="{StaticResource Primary}"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,-8,0,0" />
+
+            <!-- 3. Card: Localizar Pessoa -->
+            <Border Style="{StaticResource CardBorder}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Localizar Pessoa"
+                           FontAttributes="Bold"
+                           FontSize="15" />
+
+                    <!-- Campo de Busca por ID, Nome ou CPF -->
+                    <Border StrokeShape="RoundRectangle 8"
+                            Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
+                            StrokeThickness="1"
+                            Padding="8,0">
+                        <Grid ColumnDefinitions="*,Auto" HeightRequest="40">
+                            <Entry Grid.Column="0"
+                                   Text="{Binding SearchText}"
+                                   Placeholder="Digite nome, CPF ou ID para filtrar..."
+                                   FontSize="14"
+                                   VerticalOptions="Center"
+                                   ClearButtonVisibility="WhileEditing" />
+                            <Label Grid.Column="1"
+                                   FontFamily="MaterialIcons"
+                                   Text="&#xe8b6;"
+                                   FontSize="20"
+                                   VerticalOptions="Center"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                                   Margin="0,0,4,0" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Seletor de Aluno -->
+                    <VerticalStackLayout Spacing="4" IsVisible="{Binding ModoAluno}">
+                        <Label Text="Selecione o Aluno:"
+                               FontSize="13"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
+                        <Border StrokeShape="RoundRectangle 8"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
+                                StrokeThickness="1"
+                                Padding="8,0">
+                            <Picker ItemsSource="{Binding AlunosFiltrados}"
+                                    SelectedItem="{Binding SelectedAluno}"
+                                    ItemDisplayBinding="{Binding Nome}"
+                                    Title="Toque para escolher o aluno..."
+                                    HeightRequest="42"
+                                    VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Seletor de Colaborador -->
+                    <VerticalStackLayout Spacing="4" IsVisible="{Binding ModoColaborador}">
+                        <Label Text="Selecione o Colaborador:"
+                               FontSize="13"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
+                        <Border StrokeShape="RoundRectangle 8"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
+                                StrokeThickness="1"
+                                Padding="8,0">
+                            <Picker ItemsSource="{Binding ColaboradoresFiltrados}"
+                                    SelectedItem="{Binding SelectedColaborador}"
+                                    ItemDisplayBinding="{Binding Nome}"
+                                    Title="Toque para escolher o colaborador..."
+                                    HeightRequest="42"
+                                    VerticalOptions="Center" />
+                        </Border>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 4. Card: Identificação e Liberação -->
+            <Border Style="{StaticResource CardBorder}"
+                    Padding="16"
+                    IsVisible="{Binding TemPessoaSelecionada}">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="Identificação e Liberação"
+                           FontAttributes="Bold"
+                           FontSize="15" />
+
+                    <!-- Informações da Pessoa -->
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" VerticalOptions="Center">
+                        <!-- Foto Circular -->
+                        <Border Grid.Column="0"
+                                HeightRequest="70"
+                                WidthRequest="70"
+                                StrokeShape="RoundRectangle 35"
+                                Stroke="{StaticResource Primary}"
+                                StrokeThickness="2"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}">
+                            <Image Source="{Binding PessoaFoto, Converter={StaticResource FotoConverter}}"
+                                   Aspect="AspectFill"
+                                   HeightRequest="70"
+                                   WidthRequest="70" />
+                        </Border>
+
+                        <!-- Dados Pessoais e Badge -->
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                            <Label Text="{Binding PessoaNome}"
+                                   FontAttributes="Bold"
+                                   FontSize="17"
+                                   LineBreakMode="TailTruncation" />
+
+                            <Label Text="{Binding PessoaCpf, StringFormat='CPF: {0}'}"
+                                   FontSize="13"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
+
+                            <!-- Badge de Status (DENTRO / FORA) -->
+                            <HorizontalStackLayout Spacing="6" Margin="0,4,0,0">
+                                <Border Padding="10,3"
+                                        StrokeShape="RoundRectangle 6"
+                                        BackgroundColor="{Binding StatusBadgeBgColor}"
+                                        StrokeThickness="0">
+                                    <Label Text="{Binding StatusTexto}"
+                                           TextColor="White"
+                                           FontAttributes="Bold"
+                                           FontSize="11" />
+                                </Border>
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <!-- Botão de Ação (Registrar Entrada / Registrar Saída) -->
+                    <Button Text="{Binding BotaoAcaoTexto}"
+                            Command="{Binding RegistrarAcessoCommand}"
+                            FontAttributes="Bold"
+                            FontSize="15"
+                            HeightRequest="48"
+                            CornerRadius="8"
+                            BackgroundColor="{StaticResource Primary}"
+                            TextColor="White"
+                            Margin="0,4,0,0">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialIcons"
+                                             Glyph="{Binding BotaoAcaoIcone}"
+                                             Color="White" />
+                        </Button.ImageSource>
+                    </Button>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 5. Card de Feedback / Notificação (Banner Colorido) -->
+            <Border StrokeShape="RoundRectangle 8"
+                    Padding="16"
+                    BackgroundColor="{Binding FeedbackBgColor}"
+                    StrokeThickness="0"
+                    IsVisible="{Binding TemFeedback}">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                    <Label Grid.Column="0"
+                           FontFamily="MaterialIcons"
+                           Text="{Binding FeedbackIcone}"
+                           FontSize="28"
+                           TextColor="White"
+                           VerticalOptions="Center" />
+
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                        <Label Text="{Binding FeedbackTitulo}"
+                               TextColor="White"
+                               FontAttributes="Bold"
+                               FontSize="16" />
+                        <Label Text="{Binding FeedbackMensagem}"
+                               TextColor="White"
+                               FontSize="13" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- 6. Card: Acessos Registrados Hoje -->
+            <Border Style="{StaticResource CardBorder}" Padding="16">
+                <VerticalStackLayout Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                        <Label Grid.Column="0"
+                               Text="Acessos Registrados Hoje"
+                               FontAttributes="Bold"
+                               FontSize="15"
+                               VerticalOptions="Center" />
+
+                        <Button Grid.Column="1"
+                                Text="Atualizar"
+                                Command="{Binding CarregarHistoricoAcessosCommand}"
+                                FontSize="12"
+                                HeightRequest="34"
+                                Padding="12,0"
+                                CornerRadius="6"
+                                Style="{StaticResource ButtonPrimary}">
+                            <Button.ImageSource>
+                                <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe5d5;" Size="14" Color="White" />
+                            </Button.ImageSource>
+                        </Button>
+                    </Grid>
+
+                    <!-- Lista de Acessos de Hoje -->
+                    <CollectionView ItemsSource="{Binding AcessosHoje}"
+                                    SelectionMode="None"
+                                    HeightRequest="240">
+                        <CollectionView.EmptyView>
+                            <VerticalStackLayout Padding="20" Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                                <Label FontFamily="MaterialIcons" Text="&#xe88e;" FontSize="32" HorizontalOptions="Center"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray600}}" />
+                                <Label Text="Nenhum acesso registrado hoje."
+                                       FontSize="13"
+                                       HorizontalOptions="Center"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray500}}" />
+                            </VerticalStackLayout>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="dto:AcessoHistoricoItemDto">
+                                <Border Margin="0,3"
+                                        Padding="10,8"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                                        StrokeThickness="1"
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                                        <!-- Ícone Entrada / Saída -->
+                                        <Border Grid.Column="0"
+                                                HeightRequest="36"
+                                                WidthRequest="36"
+                                                StrokeShape="RoundRectangle 18"
+                                                BackgroundColor="{Binding EhEntrada, Converter={x:Null}}"
+                                                StrokeThickness="0"
+                                                VerticalOptions="Center">
+                                            <Border.Triggers>
+                                                <DataTrigger TargetType="Border" Binding="{Binding EhEntrada}" Value="True">
+                                                    <Setter Property="BackgroundColor" Value="#2E7D32" />
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="Border" Binding="{Binding EhEntrada}" Value="False">
+                                                    <Setter Property="BackgroundColor" Value="#0277BD" />
+                                                </DataTrigger>
+                                            </Border.Triggers>
+                                            <Label FontFamily="MaterialIcons"
+                                                   Text="{Binding EhEntrada, Converter={x:Null}}"
+                                                   FontSize="18"
+                                                   TextColor="White"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center">
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding EhEntrada}" Value="True">
+                                                        <Setter Property="Text" Value="&#xe5c8;" />
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding EhEntrada}" Value="False">
+                                                        <Setter Property="Text" Value="&#xe5c4;" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                        </Border>
+
+                                        <!-- Informações da Pessoa e Descrição -->
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                            <Label Text="{Binding NomePessoa}"
+                                                   FontAttributes="Bold"
+                                                   FontSize="14"
+                                                   LineBreakMode="TailTruncation" />
+                                            <Label Text="{Binding Descricao}"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
+                                                   LineBreakMode="TailTruncation" />
+                                        </VerticalStackLayout>
+
+                                        <!-- Hora -->
+                                        <Label Grid.Column="2"
+                                               Text="{Binding HoraFormatada}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
+                                               VerticalOptions="Center" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

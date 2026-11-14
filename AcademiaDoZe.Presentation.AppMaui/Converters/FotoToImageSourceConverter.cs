@@ -11,6 +11,10 @@ public class FotoToImageSourceConverter : IValueConverter
         {
             return ImageSource.FromStream(() => new MemoryStream(foto.Conteudo));
         }
+        if (value is byte[] bytes && bytes.Length > 0)
+        {
+            return ImageSource.FromStream(() => new MemoryStream(bytes));
+        }
         return null;
     }
 

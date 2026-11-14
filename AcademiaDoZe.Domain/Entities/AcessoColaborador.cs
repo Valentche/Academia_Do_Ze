@@ -24,4 +24,5 @@ public sealed class AcessoColaborador : Entity, IAggregateRoot
             return Result<AcessoColaborador>.Failure(notifications);
         return Result<AcessoColaborador>.Success(new AcessoColaborador(id, colaborador!.Id, dataHora));
     }
+    public static AcessoColaborador Carregar(int id, int colaboradorId, DateTime dataHora) => new(id, colaboradorId, dataHora);
 }
