@@ -110,23 +110,7 @@ public class AcessoService : IAcessoService
 
         if (!estaDentro)
         {
-            // Valida limite de jornada (8h para CLT, 6h para Estágio)
             var horasHoje = await _acessoColaboradorRepoFactory().ObterHorasTrabalhadasNoDia(colaboradorId, DateOnly.FromDateTime(DateTime.Today), cancellationToken);
-            var limite = colaborador.Vinculo == ColaboradorVinculo.Clt ? TimeSpan.FromHours(8) : TimeSpan.FromHours(6);
-
-            if (horasHoje >= limite)
-            {
-                int limiteHoras = colaborador.Vinculo == ColaboradorVinculo.Clt ? 8 : 6;
-                return new AcessoResultadoDto
-                {
-                    Sucesso = false,
-                    TipoResultado = TipoAcessoResultado.AcessoNegado,
-                    Titulo = "Acesso Negado",
-                    Mensagem = $"Acesso negado: colaborador já atingiu o limite de jornada de {limiteHoras} horas no dia.",
-                    EhEntrada = true,
-                    HorasTrabalhadasHoje = horasHoje
-                };
-            }
 
             // Registra entrada
             var acesso = AcessoColaborador.Carregar(0, colaboradorId, DateTime.Now);
